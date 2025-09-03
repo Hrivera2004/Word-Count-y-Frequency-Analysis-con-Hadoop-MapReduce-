@@ -18,9 +18,6 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 public class WordFreq {
 
-    // =======================
-    // Mapper UNIGRAM (palabras)
-    // =======================
     public static class TokenizerMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
         private static final IntWritable ONE = new IntWritable(1);
         private final Text word = new Text();
@@ -43,9 +40,6 @@ public class WordFreq {
         }
     }
 
-    // =======================
-    // Mapper BIGRAM (pares consecutivos)
-    // =======================
     public static class BigramMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
         private static final IntWritable ONE = new IntWritable(1);
         private final Text bigram = new Text();
@@ -80,9 +74,6 @@ public class WordFreq {
         }
     }
 
-    // =======================
-    // Reducer (y Combiner)
-    // =======================
     public static class IntSumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
         private final IntWritable result = new IntWritable();
 
@@ -96,14 +87,9 @@ public class WordFreq {
         }
     }
 
-    // =======================
-    // MAIN (acepta 2 o 3 argumentos)
-    // =======================
+
     public static void main(String[] args) throws Exception {
 
-        // Permite:
-        //  - 3 args: <unigram|bigram> <input> <output>
-        //  - 2 args: <input> <output>  (modo compat -> unigram)
         if (args.length < 2) {
             System.err.println("Uso:");
             System.err.println("  WordFreq <unigram|bigram> <input> <output>");
@@ -133,7 +119,6 @@ public class WordFreq {
         Job job = Job.getInstance(conf, "word-frequency-" + mode);
         job.setJarByClass(WordFreq.class);
 
-        // Mapper / Reducer según modo
         switch (mode) {
             case "unigram":
                 job.setMapperClass(TokenizerMapper.class);
@@ -155,7 +140,6 @@ public class WordFreq {
         FileOutputFormat.setOutputPath(job, output);  // OUTPUT = args[2] (o args[1] en modo compat)
 
         System.out.println("Mode=" + mode + " | input=" + input + " | output=" + output);
-
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 }
